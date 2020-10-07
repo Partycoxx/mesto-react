@@ -1,6 +1,6 @@
 import React from 'react';
 
-const editProfileFormContent = (
+export const editProfileFormContent = (
   <>
       <input className="popup__input popup__input_type_name" id="input-name" type="text" name="name" placeholder="Кто вы?" minLength="2" maxLength="40" required noValidate />
       <span className="popup__input-error" id="input-name-error"></span>
@@ -9,7 +9,7 @@ const editProfileFormContent = (
   </>
 );
 
-const addPlaceFormContent = (
+export const addPlaceFormContent = (
   <>
       <input className="popup__input popup__input_type_place" id="input-place" type="text" name="name" placeholder="Название" minLength="1" maxLength="30" required noValidate />
       <span className="popup__input-error" id="input-place-error"></span>
@@ -18,11 +18,9 @@ const addPlaceFormContent = (
   </>
 );
 
-const addAvatarFormContent = (
+export const addAvatarFormContent = (
   <>
       <input className="popup__input popup__input_type_edit-avatar" id="avatar-link" type="url" name="avatar" placeholder="Ссылка на изображение" minLength="1" maxLength="200" required noValidate />
       <span className="popup__input-error" id="avatar-link-error"></span>
   </>
 );
-
-  export { editProfileFormContent, addPlaceFormContent, addAvatarFormContent }

@@ -11,23 +11,18 @@ function Main({onEditProfile, onAddPlace, onEditAvatar, onCardClick}) {
 
 
     useEffect(() => {
-        request.getUserData().then( data => {
+        Promise.all([request.getUserData(), request.getCardList()]).then(([data, cardList]) => {
             setUserName(data.name);
             setUserDescription(data.about);
             setUserAvatar(data.avatar);
-        });
-    }, []);
 
-    useEffect(() => {
-        request.getCardList().then( data => {
-            const items = data.map(item => ({
+            const items = cardList.map(item => ({
                 title: item.name,
                 link: item.link,
                 id: item._id
-            }))
+            }));
             setCards(items);
-        });
-    }, []);
+        })}, []);
 
     return (
         <main className="main narrow">
