@@ -40,8 +40,9 @@ function App() {
   }
 
   return (
-    <>
+    
       <div className="page">
+        <div className="page__container">
         <Header />
         <Main
           onEditProfile={handleEditProfileClick}
@@ -76,8 +77,8 @@ function App() {
           name="full-image"
           onClosePopup={closeAllPopups}
         />
+        </div>
       </div>
-    </>
   );
 }
 
