@@ -28,13 +28,13 @@
         .then(res => this._response(res)) 
     }
 
-    editUserInfo({newName, newOccupation}) {
+    editUserInfo({name, about}) {
         return fetch(`${this._baseUrl}/users/me`, {
             method: 'PATCH',
             headers: this._headers,
             body: JSON.stringify({
-                name: newName,
-                about: newOccupation
+                name,
+                about
             })            
         })
         .then(res => this._response(res))
@@ -52,24 +52,28 @@
         .then(res => this._response(res))
     }
 
-    deleteCard({cardId}) {
-        return fetch(`${this._baseUrl}/cards/${cardId}`, {
+    deleteCard({_id}) {
+        return fetch(`${this._baseUrl}/cards/${_id}`, {
             method: 'DELETE',
             headers: this._headers
         })
         .then(res => this._response(res))
     }
 
-    likeCard({cardId}) {
-        return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+    changeLike(card, isLiked) {
+        return isLiked ? this._dislikeCard(card): this._likeCard(card);
+    }
+
+    _likeCard({_id}) {
+        return fetch(`${this._baseUrl}/cards/likes/${_id}`, {
             method: 'PUT',
             headers: this._headers
         })
         .then(res => this._response(res))
     }
 
-    dislikeCard({cardId}) {
-        return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+    _dislikeCard({_id}) {
+        return fetch(`${this._baseUrl}/cards/likes/${_id}`, {
             method: 'DELETE',
             headers: this._headers
         })

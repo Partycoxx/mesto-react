@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import request from "../utils/Api";
+import {CurrentUserContext} from "../contexts/CurrentUserContext" 
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
+import EditProfilePopup from './EditProfilePopup';
 import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
 import {
-  editProfileFormContent,
   addPlaceFormContent,
   addAvatarFormContent,
 } from "../utils/utils";
@@ -15,6 +17,29 @@ function App() {
   const [isAddPlacePopupOpen, setAddPlacePopupState] = useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupState] = useState(false);
   const [selectedCard, setSelectedCard] = useState(undefined);
+
+  const [currentUser, setCurrentUser] = useState({});
+
+  useEffect(() => {
+    request.getUserData().then(userData => setCurrentUser({
+      name: userData.name, 
+      description: userData.about,
+      avatar: userData.avatar,
+      currentUserId: userData._id
+    }))
+  }, []);
+
+  function handleUpdateUser(newUserData) {
+    request.editUserInfo(newUserData).then(userData => setCurrentUser({
+      name: userData.name, 
+      description: userData.about,
+      avatar: userData.avatar,
+      currentUserId: userData._id
+    }) )
+
+    closeAllPopups();
+  }
+
 
   function handleEditAvatarClick() {
     setEditAvatarPopupState(true);
@@ -43,6 +68,7 @@ function App() {
     
       <div className="page">
         <div className="page__container">
+        <CurrentUserContext.Provider value={currentUser}>  
         <Header />
         <Main
           onEditProfile={handleEditProfileClick}
@@ -51,13 +77,7 @@ function App() {
           onCardClick={handleCardClick}
         />
         <Footer />
-        <PopupWithForm
-          title="Редактировать данные"
-          name="edit-profile"
-          children={editProfileFormContent}
-          isOpen={isEditProfilePopupOpen}
-          onClosePopup={closeAllPopups}
-        />
+        <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
         <PopupWithForm
           title="Новое место"
           name="add-place"
@@ -77,6 +97,7 @@ function App() {
           name="full-image"
           onClosePopup={closeAllPopups}
         />
+        </CurrentUserContext.Provider>
         </div>
       </div>
   );
