@@ -18,7 +18,8 @@ function App() {
   const [currentUser, setCurrentUser] = useState({});
 
   useEffect(() => {
-    Promise.all([request.getUserData(), request.getCardList()]).then(
+    Promise.all([request.getUserData(), request.getCardList()])
+    .then(
       ([userData, cardList]) => {
         setCurrentUser({
           name: userData.name,
@@ -28,7 +29,8 @@ function App() {
         });
         setCards(cardList);
       }
-    );
+    )
+    .catch(err => console.log(err))
   }, []);
 
   // ↑ Запрашиаем с сервера список карточек и данные о пользователе
@@ -37,52 +39,62 @@ function App() {
   function handleLikeClick(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser.currentUserId);
 
-    request.changeLike(card, isLiked).then((newCard) => {
+    request.changeLike(card, isLiked)
+    .then((newCard) => {
       const newCards = cards.map((c) => (c._id === card._id ? newCard : c));
       setCards(newCards);
-    });
+    })
+    .catch(err => console.log(err))
   }
 
   // Обработчик удаления карточек
   function handleDeleteClick(card) {
-    request.deleteCard(card).then((data) => {
+    request.deleteCard(card)
+    .then((data) => {
       const newCards = cards.filter((c) => c._id !== card._id);
       setCards(newCards);
-    });
+    })
+    .catch(err => console.log(err))
   }
 
   //Обработчик обновления информации о пользователе
   function handleUpdateUser(newUserData) {
-    request.editUserInfo(newUserData).then((userData) =>
+    request.editUserInfo(newUserData)
+    .then((userData) => {
       setCurrentUser({
         name: userData.name,
         description: userData.about,
         avatar: userData.avatar,
         currentUserId: userData._id,
-      })
-    );
-    closeAllPopups();
+      });
+      closeAllPopups();
+    })
+    .catch(err => console.log(err))
   }
 
   //Обработчик обновления аватара
   function handleUpdateAvatar(newAvatarLink) {
-    request.addUserAvatar(newAvatarLink).then((userData) =>
+    request.addUserAvatar(newAvatarLink)
+    .then((userData) => {
       setCurrentUser({
         name: userData.name,
         description: userData.about,
         avatar: userData.avatar,
         currentUserId: userData._id,
       })
-    );
-    closeAllPopups();
+      closeAllPopups()
+    })
+    .catch(err => console.log(err))
   }
 
   //Обработчик добавления новой карточки
   function handleAddNewPlace(newCardData) {
-    request.addNewCard(newCardData).then((newCard) => {
+    request.addNewCard(newCardData)
+    .then((newCard) => {
       setCards([newCard, ...cards]);
       closeAllPopups();
-    });
+    })
+    .catch(err => console.log(err))
   }
 
   // Обработчик, раскрывающий изображение карточки в полном формате
