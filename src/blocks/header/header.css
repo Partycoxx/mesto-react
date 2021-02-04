@@ -1,5 +1,28 @@
 .header {
-  border-bottom: 1px solid rgba(84,84,84, .7);
+  border-bottom: 1px solid rgba(84, 84, 84, 0.7);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.header__link-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header__link {
+  font-size: 18px;
+  text-decoration: none;
+  color: #fff;
+}
+
+.header__text {
+  max-width: 150px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 24px;
 }
 
 @media screen and (max-width: 382px) {
