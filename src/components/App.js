@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
-import request from '../utils/Api';
+import { Route, Switch, Redirect, useHistory } from 'react-router-dom';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import ProtectedRoute from './ProtectedRoute';
 import Header from './Header';
@@ -12,32 +11,65 @@ import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import ImagePopup from './ImagePopup';
+import InfoTooltip from './InfoTooltip';
+import request from '../utils/Api';
+import authRequest from '../utils/Auth';
 
 function App() {
   const [isEditProfilePopupOpen, setEditProfilePopupState] = useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopupState] = useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupState] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isInfoTooltipOpen, setInfoTooltipState] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedCard, setSelectedCard] = useState(undefined);
   const [cards, setCards] = useState([]);
   const [currentUser, setCurrentUser] = useState({});
+  const [email, setUserEmail] = useState('');
+
+  const history = useHistory();
 
   useEffect(() => {
-    Promise.all([request.getUserData(), request.getCardList()])
-      .then(([userData, cardList]) => {
-        setCurrentUser({
-          name: userData.name,
-          description: userData.about,
-          avatar: userData.avatar,
-          currentUserId: userData._id,
-        });
-        setCards(cardList);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    if (isLoggedIn) {
+      Promise.all([request.getUserData(), request.getCardList()])
+        .then(([userData, cardList]) => {
+          setCurrentUser({
+            name: userData.name,
+            description: userData.about,
+            avatar: userData.avatar,
+            currentUserId: userData._id,
+          });
+          setCards(cardList);
+        })
+        .catch((err) => console.log(err));
+    }
+    authRequest.checkTokenValidity().then((res) => {
+      console.log('success', res);
+      const {
+        data: { email },
+      } = res;
+      setUserEmail((prev) => email);
+      setIsLoggedIn((prev) => true);
+      history.push('/');
+    });
+  }, [isLoggedIn]);
 
   // ↑ Запрашиаем с сервера список карточек и данные о пользователе
 
+  // Обработчик выхода из приложени
+
+  function onSignOut() {
+    localStorage.removeItem('token');
+    setIsLoggedIn((prev) => false);
+    history.push('/sign-in');
+  }
+
+  //Обработчик входа в приложение
+
+  function onLogIn(token) {
+    localStorage.setItem('token', token);
+    setIsLoggedIn((prev) => true);
+    history.push('/');
+  }
   //Обработчик лайков карточек
   function handleLikeClick(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser.currentUserId);
@@ -130,13 +162,23 @@ function App() {
     setEditAvatarPopupState(false);
     setEditProfilePopupState(false);
     setAddPlacePopupState(false);
+    setInfoTooltipState(false);
   }
 
   return (
     <div className="page">
       <div className="page__container">
         <CurrentUserContext.Provider value={currentUser}>
-          <Route component={Header} />
+          <Route
+            render={(props) => (
+              <Header
+                {...props}
+                userEmail={email}
+                setIsLoggedIn={setIsLoggedIn}
+                onLogOut={onSignOut}
+              />
+            )}
+          />
           <Switch>
             <ProtectedRoute exact path="/app" isLoggedIn={isLoggedIn}>
               <Main
@@ -150,9 +192,23 @@ function App() {
               />
               <Footer />
             </ProtectedRoute>
-            <Route exact path="/sign-in" component={Login} />
+            <Route
+              exact
+              path="/sign-in"
+              render={(props) => <Login {...props} onLogIn={onLogIn} />}
+            />
 
-            <Route exact path="/sign-up" component={Register} />
+            <Route
+              exact
+              path="/sign-up"
+              render={(props) => (
+                <Register
+                  {...props}
+                  setUserEmail={setUserEmail}
+                  setInfoTooltipState={setInfoTooltipState}
+                />
+              )}
+            />
             <ProtectedRoute path={'/'} isLoggedIn={isLoggedIn}>
               {isLoggedIn ? <Redirect to="/app" /> : <Redirect to="/sign-in" />}
             </ProtectedRoute>
@@ -174,6 +230,11 @@ function App() {
             onAddNewPlace={handleAddNewPlace}
           />
           <ImagePopup card={selectedCard} name="full-image" onClosePopup={closeAllPopups} />
+          <InfoTooltip
+            isOpen={isInfoTooltipOpen}
+            onClose={closeAllPopups}
+            currentUserData={email}
+          />
         </CurrentUserContext.Provider>
       </div>
     </div>

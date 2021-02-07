@@ -1,0 +1,9 @@
+.auth__button_type_borderless {
+  background-color: #000;
+  color: #fff;
+  font-size: 14px;
+  line-height: 16, 94px;
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+}

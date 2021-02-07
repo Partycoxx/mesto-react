@@ -5,26 +5,6 @@
   align-items: baseline;
 }
 
-.header__link-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header__link {
-  font-size: 18px;
-  text-decoration: none;
-  color: #fff;
-}
-
-.header__text {
-  max-width: 150px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  margin: 24px;
-}
-
 @media screen and (max-width: 382px) {
   .header {
     margin: 0;
